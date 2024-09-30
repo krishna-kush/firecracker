@@ -2,6 +2,8 @@
 # Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# This script is running inside the docker container, it can access the current directory as it is mounted as a volume /work
+
 # fail if we encounter an error, uninitialized variable or a pipe breaks
 set -eu -o pipefail
 
@@ -54,6 +56,7 @@ rm -f /etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service
 
 # make /tmp a tmpfs
 ln -s /usr/share/systemd/tmp.mount /etc/systemd/system/tmp.mount
+# err: Failed to enable unit: Unit tmp.mount does not exist // the err was induced only in some versions of ubuntu docker images specifically 24.10 // Reason: the file /usr/share/systemd/tmp.mount does not exist in the ubuntu docker image // Fix: just create it under overlay dir, which will get copy in rebuild.sh
 systemctl enable tmp.mount
 
 # don't need this
